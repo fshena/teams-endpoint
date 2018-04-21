@@ -1,0 +1,321 @@
+openapi: 3.0.0
+
+info:
+  title: Teams Endpoint
+  version: 1.0.0
+  description: API endpoint for the teams
+
+servers:
+- url: 'http://api.localleague.local:3000'
+  description: Local development server
+- url: 'http://api.localleague.local:3000'
+  description: Production server
+
+security:
+- BearerAuth: []
+
+paths:
+  /teams:
+    get:
+      tags:
+      - Teams
+      summary: Get teams list
+      description: Get a paginated list of teams
+      operationId: getTeams
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+        required: false
+        description: The number of results returned in the response
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+          - id
+          - name
+          - logo
+          - is_active
+        required: false
+        description: A comma separated list of the team's fields to be returned in the response
+      - in: query
+        name: order
+        schema:
+          type: string
+          default: asc
+          enum:
+          - asc
+          - desc
+        required: false
+        description: The order of the returned results
+      - in: query
+        name: sort
+        schema:
+          type: string
+          default: name
+          enum:
+          - id
+          - name
+          - logo
+          - is_active
+        required: false
+        description: Sort results by specific team field
+      responses:
+        '200':
+          description: A full list of teams
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+    post:
+      tags:
+        - Teams
+      summary: Create team
+      description: Create a new team
+      operationId: postTeams
+      requestBody:
+        description: An object containing the team's data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+      responses:
+        '201':
+          description: Team succesfully created
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Content-Location:
+              $ref: '#/components/headers/Content-Location'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+  /teams/{teamId}:
+    get:
+      tags:
+        - Teams
+      summary: Get a specific team
+      description: Get data for a specific team
+      operationId: getTeamsById
+      parameters:
+      - in: path
+        name: teamId
+        required: true
+        schema:
+          type: number
+        description: Team ID
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+          - id
+          - name
+          - logo
+          - is_active
+        required: false
+        description: A comma separated list of the team's fields to be returned in the response
+      responses:
+        '200':
+          description: A team object
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+    put:
+      tags:
+        - Teams
+      summary: Update team
+      description: Replace existing team's data
+      operationId: putTeam
+      parameters:
+      - in: path
+        name: teamId
+        required: true
+        schema:
+          type: number
+        description: Team ID
+      requestBody:
+        description: An object containing the new team data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+      responses:
+        '204':
+          description: Team successfully updated
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+    delete:
+      tags:
+        - Teams
+      summary: Delete team
+      description: Delete existing team
+      operationId: deleteTeam
+      parameters:
+      - in: path
+        name: teamId
+        required: true
+        schema:
+          type: number
+        description: Team ID
+      responses:
+        '204':
+          description: Team successfully deleted
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+
+components:
+  schemas:
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The team identifier
+          example: 123
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9-. ]+$'
+          minLength: 3
+          maxLength: 100
+          description: The team name.
+          example: 'Chelsea'
+        logo:
+          type: string
+          format: uri
+          description: The link to the team's logo.
+          example: 'https://s3.amazonaws.com/128.jpg'
+        isActive:
+          type: boolean
+          description: A flag defining if the team is activated or not.
+          example: false
+      required:
+      - name
+      - logo
+      - isActive
+
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+      description: Request limit per specific hour
+    X-RateLimit-Rate:
+      schema:
+        type: number
+      description: Rate of the requests
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+      description: Remaining request of the 'Limit'
+    Content-Location:
+      schema:
+        type: string
+      description: The link to the newly created team
+    Link:
+      schema:
+        type: string
+      description: 'A link for the next, previous, last and first results set'
+
+  responses:
+    UNAUTHORIZED:
+      description: Not a valid access token
+    UNPROCESSABLE_ENTITY:
+      description: Not a valid team object
+    BAD_REQUEST:
+      description: The request is not valid
+    NOT_FOUND:
+      description: Team was not found
+    FORBIDDEN:
+      description: Not allowed to access entity
+    JWT:
+      description: An object containing a valid JWT
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+- name: Teams
+  description: Everything about a Team
+  externalDocs:
+    url: http://docs.my-api.com/pet-operations.htm
